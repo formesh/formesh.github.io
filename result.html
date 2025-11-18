@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验证结果</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .container { height: 100dvh; width: 100%; padding: 1rem; background: linear-gradient(180deg, rgba(232,243,255,0.5) 0%, #FFFFFE 100%); }
+        .result { height: 40%; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .message { color: #1D2129; line-height: 28px; text-align: center; font-size: 15px; }
+        .button { margin-top: 48px; display: flex; justify-content: center; align-items: center; }
+        button { width: 160px; height: 40px; background: #F6F6F6; border-radius: 6px; border: 1px solid #E5E7EA; color: #1D2129; cursor: pointer; }
+        button:hover { background: #E5E7EA; }
+        .circle { width: 160px; height: 160px; border-radius: 50%; border: 6px solid #52c41a; background: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+      <div class="result">
+        <div class="circle"></div>
+      </div>
+      <div class="message">
+        人脸识别录入成功，返回系统即可使用
+      </div>
+      <div class="button">
+        <button onclick="history.back()">前往系统</button>
+      </div>
+    </div>
+</body>
+</html>
