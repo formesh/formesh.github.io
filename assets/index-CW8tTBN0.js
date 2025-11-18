@@ -1,0 +1,18 @@
+(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))s(n);new MutationObserver(n=>{for(const i of n)if(i.type==="childList")for(const r of i.addedNodes)r.tagName==="LINK"&&r.rel==="modulepreload"&&s(r)}).observe(document,{childList:!0,subtree:!0});function o(n){const i={};return n.integrity&&(i.integrity=n.integrity),n.referrerPolicy&&(i.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?i.credentials="include":n.crossOrigin==="anonymous"?i.credentials="omit":i.credentials="same-origin",i}function s(n){if(n.ep)return;n.ep=!0;const i=o(n);fetch(n.href,i)}})();const y=async()=>{try{return(await navigator.mediaDevices.enumerateDevices()).some(t=>t.kind==="videoinput")}catch(e){return console.error("获取设备失败：",e),!1}};let a=null,l=null;const m=async()=>{try{const e=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:720},height:{ideal:720}}}),t=document.getElementById("video");return t.setAttribute("playsinline","true"),t.muted=!0,a=e,t.srcObject=e,await t.play(),!0}catch(e){const t=document.getElementById("no-camera");let o="";const s=e&&e.name?e.name:"";return s==="NotAllowedError"?o="未授权摄像头，请在浏览器设置中允许摄像头权限":s==="NotFoundError"?o="未检测到摄像头设备":o="无法打开摄像头："+(e&&e.message?e.message:""),t&&(t.textContent=o,t.style.display=o?"":"none"),!1}},p=()=>{a&&(a.getTracks().forEach(e=>e.stop()),a=null)},f=()=>{const e=document.getElementById("video"),t=document.querySelector(".round-preview"),o=e.videoWidth,s=e.videoHeight;if(!o||!s)return;const n=Math.min(o,s),i=(o-n)/2,r=(s-n)/2,d=document.createElement("canvas");d.width=n,d.height=n,d.getContext("2d").drawImage(e,i,r,n,n,0,0,n,n),l=d.toDataURL("image/jpeg",.9),p(),e.style.display="none";let c=document.getElementById("captured");c||(c=document.createElement("img"),c.id="captured",t.appendChild(c)),c.src=l,c.style.display="block",u("confirm")},v=async()=>{const e=document.getElementById("video"),t=document.getElementById("captured");t&&(t.style.display="none"),e.style.display="block",await m(),u("shoot")},u=e=>{const t=document.getElementById("actions");t&&(e==="shoot"?(t.innerHTML='<button id="btn-shoot">拍照</button>',document.getElementById("btn-shoot").addEventListener("click",f)):(t.innerHTML='<button id="btn-retake">重新拍照</button><button id="btn-confirm">确认</button>',document.getElementById("btn-retake").addEventListener("click",v),document.getElementById("btn-confirm").addEventListener("click",()=>{if(l){const o=document.createElement("a");o.href=l,o.download="capture.jpg",document.body.appendChild(o),o.click(),o.remove()}})))},g=async()=>{const e=document.querySelector("#app");e.innerHTML=`
+  <div class="container">
+    <div class="card left" id="left-card">
+      <div class="round-preview">
+        <img src="/face.png" alt="" />
+      </div>
+      <button id="btn-start">开始拍照</button>
+      <div class="notice" id="no-camera"></div>
+    </div>
+    <div class="card right" id="right-card" style="display:none">
+      <div class="title">请将脸完整移入框内</div>
+      <div class="round-preview">
+        <video id="video" autoplay playsinline muted></video>
+      </div>
+      <div class="actions" id="actions"></div>
+    </div>
+  </div>
+`;const t=document.getElementById("btn-start"),o=document.getElementById("no-camera");await y()||(t.disabled=!0,o.textContent="当前浏览器不支持摄像头"),!o.textContent||!o.textContent.trim()?o.style.display="none":o.style.display="",t.addEventListener("click",async()=>{const n=document.getElementById("left-card"),i=document.getElementById("right-card");n.style.display="none",i.style.display="block",await m(),u("shoot")})};g();
