@@ -1,2 +1,2 @@
-qq=123
+qq=850534595
 url=https://baidu.com

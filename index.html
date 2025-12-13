@@ -298,12 +298,11 @@
                 const url2 = fresh.url;
                 if (action === 'qq') {
                     if (qq2) {
-                        window.open(
-                            'tencent://message/?uin=' +
-                                encodeURIComponent(qq2) +
-                                '&Site=&Menu=yes',
-                            '_blank'
-                        );
+                        const url3 =
+                            'https://wpa.qq.com/msgrd?v=3&uin=' +
+                            encodeURIComponent(qq2) +
+                            '&site=qq&menu=yes';
+                        window.open(url3, '_blank');
                     } else {
                         alert('未配置客服 QQ');
                     }
@@ -320,12 +319,11 @@
                     return;
                 }
                 if (qq2) {
-                    window.open(
-                        'tencent://message/?uin=' +
-                            encodeURIComponent(qq2) +
-                            '&Site=&Menu=yes',
-                        '_blank'
-                    );
+                    const url3 =
+                        'https://wpa.qq.com/msgrd?v=3&uin=' +
+                        encodeURIComponent(qq2) +
+                        '&site=qq&menu=yes';
+                    window.open(url3, '_blank');
                 } else if (url2) {
                     window.open(url2, '_blank');
                 } else {
