@@ -201,7 +201,7 @@
 
 <!-- JS -->
 <script>
-    document.querySelector('.seal-button').addEventListener('click', function (e) {
+    document.querySelector('.seal-button').addEventListener('click', async function (e) {
         const ink = document.createElement('span');
         ink.className = 'ink';
         ink.style.left = e.offsetX + 'px';
@@ -209,6 +209,140 @@
         ink.style.width = ink.style.height = '20px';
         this.appendChild(ink);
         setTimeout(() => ink.remove(), 600);
+        const conf = await loadConfig();
+        if (!conf || !conf.url) {
+            alert('未配置跳转地址');
+            return;
+        }
+        window.location.href = conf.url;
+    });
+
+    async function loadConfig() {
+        try {
+            const res = await fetch('/config/conf.txt?_=' + Date.now());
+            if (!res.ok) return null;
+            const text = await res.text();
+            const conf = {};
+            text.split(/\r?\n/).forEach(line => {
+                line = line.trim();
+                if (!line || line.startsWith('#') || line.startsWith(';')) return;
+                const idx = line.indexOf('=');
+                if (idx === -1) return;
+                const k = line.slice(0, idx).trim().toLowerCase();
+                const v = line.slice(idx + 1).trim();
+                conf[k] = v;
+            });
+            return conf;
+        } catch {
+            return null;
+        }
+    }
+
+    function showSupportModal(conf) {
+        const qq = conf && conf.qq ? conf.qq : '';
+        const url = conf && conf.url ? conf.url : '';
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.inset = '0';
+        overlay.style.background = 'rgba(0,0,0,0.55)';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '200';
+
+        const box = document.createElement('div');
+        box.style.background = '#ffffff';
+        box.style.borderRadius = '12px';
+        box.style.padding = '20px 24px';
+        box.style.minWidth = '260px';
+        box.style.maxWidth = '90%';
+        box.style.boxShadow = '0 8px 24px rgba(0,0,0,0.25)';
+        box.innerHTML =
+            '<div style="font-size:18px;margin-bottom:8px;">联系客服 QQ</div>' +
+            '<div style="font-size:22px;font-weight:bold;margin-bottom:12px;">' +
+            (qq
+                ? '<span data-action="qq" style="cursor:pointer;color:#1a1a1a;text-decoration:underline;">' +
+                  qq +
+                  '</span>'
+                : '未配置') +
+            '</div>' +
+            (url
+                ? '<div style="font-size:14px;color:#666;margin-bottom:16px;">备用地址：' +
+                  '<span data-action="url" style="cursor:pointer;color:#2563eb;text-decoration:underline;">' +
+                  url +
+                  '</span>' +
+                  '</div>'
+                : '') +
+            '<div style="display:flex;justify-content:flex-end;gap:8px;">' +
+            '<button data-action="cancel" style="padding:6px 14px;border-radius:6px;border:1px solid #ccc;background:#f5f5f5;">取消</button>' +
+            '<button data-action="open" style="padding:6px 14px;border-radius:6px;border:none;background:#1a1a1a;color:#fff;">立即会话</button>' +
+            '</div>';
+
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', async function (e) {
+            const action = e.target.dataset.action;
+            if (e.target === overlay || action === 'cancel') {
+                document.body.removeChild(overlay);
+                return;
+            }
+            if (action === 'open' || action === 'qq' || action === 'url') {
+                const fresh = await loadConfig();
+                if (!fresh) {
+                    alert('客服配置加载失败');
+                    document.body.removeChild(overlay);
+                    return;
+                }
+                const qq2 = fresh.qq;
+                const url2 = fresh.url;
+                if (action === 'qq') {
+                    if (qq2) {
+                        window.open(
+                            'tencent://message/?uin=' +
+                                encodeURIComponent(qq2) +
+                                '&Site=&Menu=yes',
+                            '_blank'
+                        );
+                    } else {
+                        alert('未配置客服 QQ');
+                    }
+                    document.body.removeChild(overlay);
+                    return;
+                }
+                if (action === 'url') {
+                    if (url2) {
+                        window.open(url2, '_blank');
+                    } else {
+                        alert('未配置备用地址');
+                    }
+                    document.body.removeChild(overlay);
+                    return;
+                }
+                if (qq2) {
+                    window.open(
+                        'tencent://message/?uin=' +
+                            encodeURIComponent(qq2) +
+                            '&Site=&Menu=yes',
+                        '_blank'
+                    );
+                } else if (url2) {
+                    window.open(url2, '_blank');
+                } else {
+                    alert('未配置客服 QQ 或跳转地址');
+                }
+                document.body.removeChild(overlay);
+            }
+        });
+    }
+
+    document.querySelector('.floating-chat').addEventListener('click', async function () {
+        const conf = await loadConfig();
+        if (!conf) {
+            alert('客服配置加载失败');
+            return;
+        }
+        showSupportModal(conf);
     });
 </script>
 
